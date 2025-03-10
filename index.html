@@ -9,82 +9,53 @@
 </head>
 <body>
 
+<button id="connect-btn">Se connecter</button>
+<p id="status">Statut : En attente...</p>
+<div id="color-control" style="display: none;">
+    <div id="color-picker"></div>
+    <button id="send-color-btn">Éclairer</button>
+</div>
 
-    <!-- Section de connexion (affichée par défaut) -->
-    <div class="connexion" id="connexion-section">
-        <button id="connect-btn">Rechercher une appareil</button>
-        <p id="status">Statut : En attente de connexion...</p>
-    </div>
+<script>
+    let device;
+    let characteristic;
 
-    <!-- Section de contrôle des couleurs (cachée au départ) -->
-    <div id="color-control" style="display: none;">
-        <div id="color-picker"></div>
-        <button id="send-color-btn">Éclairer</button>
-        
-    </div>
+    async function connectBluetooth() {
+        try {
+            device = await navigator.bluetooth.requestDevice({
+                acceptAllDevices: true,
+                optionalServices: ['00001101-0000-1000-8000-00805f9b34fb'] // Service du HC-06
+            });
 
-    <script>
-        let port;
+            const server = await device.gatt.connect();
+            const service = await server.getPrimaryService('00001101-0000-1000-8000-00805f9b34fb');
+            characteristic = await service.getCharacteristic('00001101-0000-1000-8000-00805f9b34fb');
 
-        // Fonction de connexion à la barre LED
-        async function connectSerial() {
-            try {
-                port = await navigator.serial.requestPort();
-                await port.open({ baudRate: 9600 });
+            document.getElementById("status").innerText = "Connecté";
+            document.getElementById("connect-btn").style.display = "none";
+            document.getElementById("color-control").style.display = "block";
+        } catch (error) {
+            console.error("Erreur de connexion Bluetooth :", error);
+            document.getElementById("status").innerText = "Échec de connexion.";
+        }
+    }
 
-                document.getElementById("status").innerText = "Connecté";
-
-                // Masquer la section de connexion et afficher le sélecteur de couleur
-                document.getElementById("connexion-section").style.display = "none";
-                document.getElementById("color-control").style.display = "block";
-
-                const reader = port.readable.getReader();
-                while (true) {
-                    const { value, done } = await reader.read();
-                    if (done) break;
-                    console.log(new TextDecoder().decode(value));
-                }
-                reader.releaseLock();
-            } catch (error) {
-                console.error("Erreur :", error);
-                document.getElementById("status").innerText = "Erreur de connexion.";
-            }
+    async function sendColor() {
+        if (!characteristic) {
+            alert("Aucun appareil connecté !");
+            return;
         }
 
-        // Initialisation de la palette Iro.js
-        let colorPicker = new iro.ColorPicker("#color-picker", {
-            width: 300,
-            layout: [
-                { component: iro.ui.Wheel },
-                { component: iro.ui.Slider, options: { sliderType: 'value' } }
-            ]
-        });
+        const rgb = colorPicker.color.rgb;
+        const message = new TextEncoder().encode(`${rgb.r},${rgb.g},${rgb.b}\n`);
 
-        // Mise à jour de l'affichage de la couleur sélectionnée
-        colorPicker.on('color:change', function(color) {
-            document.getElementById("selected-color").innerText = color.hexString;
-        });
+        await characteristic.writeValue(message);
+        console.log("Couleur envoyée :", message);
+    }
 
-        // Fonction pour envoyer la couleur sélectionnée au HC-06
-        async function sendColor() {
-            if (!port) {
-                alert("Aucun appareil connectée !");
-                return;
-            }
+    document.getElementById("connect-btn").addEventListener("click", connectBluetooth);
+    document.getElementById("send-color-btn").addEventListener("click", sendColor);
+</script>
 
-            const rgb = colorPicker.color.rgb;
-            const message = `${rgb.r},${rgb.g},${rgb.b}\n`;
-
-            const writer = port.writable.getWriter();
-            await writer.write(new TextEncoder().encode(message));
-            writer.releaseLock();
-
-            console.log("Couleur envoyée :", message);
-        }
-
-        // Associer les événements aux boutons
-        document.getElementById("connect-btn").addEventListener("click", connectSerial);
-        document.getElementById("send-color-btn").addEventListener("click", sendColor);
-    </script>
 </body>
 </html>
