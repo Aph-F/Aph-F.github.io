@@ -1,0 +1,123 @@
+
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #0e72a8;
+    border: none;
+    margin: 0;
+}
+
+:root {
+    --background:#262626;
+    --text: #ffffff;
+    --barre: #000000;
+    --boutons: #000000;
+    --boutonsHover: #262626;
+}
+
+
+h1
+{
+    color: var(--text);
+}
+
+h2
+{
+    color: var(--text);
+    font-size: 30px;
+}
+
+p
+{
+    color: var(--text);;
+}
+.btnMenu{
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 10px;
+    cursor: pointer;
+    border: none;
+    background-color: var(--boutons);
+    color: var(--text);
+    border-radius: 2px;
+}
+
+.btnMenu:hover {
+    background-color: var(--boutonsHover);
+
+}
+
+#connect-btn
+{
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 10px;
+    cursor: pointer;
+    border: none;
+    background-color: var(--boutons);
+    color: var(--text);
+    border-radius: 2px;
+}
+
+#connect-btn:hover {
+    background-color: var(--boutonsHover);
+
+}
+
+
+#send-color-btn
+{
+    width: 100px;
+    height: 50px;
+    font-size: 18px;
+    cursor: pointer;
+    border: none;
+    background-color: var(--boutons);
+    color: var(--text);
+    border-radius: 50px; 
+}
+
+#send-color-btn:hover
+{
+ background-color: var(--boutonsHover); 
+}
+
+#color-control
+{
+    margin-top: 125px;
+}
+#color-picker {
+    width: 300px;
+    margin: 20px auto;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.barre
+{
+    width: 100%;
+    height: 70px;
+    border: none;
+    background-color: var(--barre);
+    
+}
+
+.connexion
+{
+    margin-top: 100px;
+    margin-bottom: 100px;
+}
+
+.logo
+{
+    width: 250px;
+    transform: translateY(50%);
+    left: 30px;
+}
+
+.blockBtn
+{
+ text-align: right;
+ transform: translateY(-55%); 
+ margin-right: 200px;
+}
